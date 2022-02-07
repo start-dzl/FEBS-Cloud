@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
 * ${tableComment} Entity
@@ -27,6 +28,7 @@ public class ${className} {
     /**
      * ${column.remark}
      */
+    @ApiModelProperty("${column.remark}")
         <#if column.isKey = true>
     @TableId(value = "${column.name}", type = IdType.AUTO)
         <#else>

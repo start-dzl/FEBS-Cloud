@@ -65,10 +65,39 @@ public class GeneratorHelper {
         this.generateFileByTemplate(templateName, entityFile, data);
     }
 
+    public void generateRequestFile(List<Column> columns, GeneratorConfig configure) throws Exception {
+        String suffix = GeneratorConstant.REQUEST_FILE_SUFFIX;
+        String path = getFilePath(configure, "request", suffix, false);
+        String templateName = GeneratorConstant.REQUEST_TEMPLATE;
+        File entityFile = new File(path);
+        JSONObject data = toJsonObject(configure);
+        data.put("hasDate", false);
+        data.put("hasBigDecimal", false);
+        columns.forEach(c -> {
+            c.setField(FebsUtil.underscoreToCamel(StringUtils.lowerCase(c.getName())));
+            if (StringUtils.containsAny(c.getType(), FieldType.DATE, FieldType.DATETIME, FieldType.TIMESTAMP)) {
+                data.put("hasDate", true);
+            }
+            if (StringUtils.containsAny(c.getType(), FieldType.DECIMAL, FieldType.NUMERIC)) {
+                data.put("hasBigDecimal", true);
+            }
+        });
+        data.put("columns", columns);
+        this.generateFileByTemplate(templateName, entityFile, data);
+    }
+
     public void generateMapperFile(List<Column> columns, GeneratorConfig configure) throws Exception {
         String suffix = GeneratorConstant.MAPPER_FILE_SUFFIX;
         String path = getFilePath(configure, configure.getMapperPackage(), suffix, false);
         String templateName = GeneratorConstant.MAPPER_TEMPLATE;
+        File mapperFile = new File(path);
+        generateFileByTemplate(templateName, mapperFile, toJsonObject(configure));
+    }
+
+    public void generateConvertFile(List<Column> columns, GeneratorConfig configure) throws Exception {
+        String suffix = GeneratorConstant.CONVERT_FILE_SUFFIX;
+        String path = getFilePath(configure, "conversion", suffix, false);
+        String templateName = GeneratorConstant.CONVERT_TEMPLATE;
         File mapperFile = new File(path);
         generateFileByTemplate(templateName, mapperFile, toJsonObject(configure));
     }

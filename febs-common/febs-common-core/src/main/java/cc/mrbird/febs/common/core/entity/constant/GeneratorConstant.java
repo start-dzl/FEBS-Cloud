@@ -18,6 +18,12 @@ public interface GeneratorConstant {
     String TEMP_PATH = "febs_gen_temp/";
 
     /**
+     * Request文件类型后缀
+     */
+    String REQUEST_FILE_SUFFIX= "Request.java";
+
+
+    /**
      * java类型文件后缀
      */
     String JAVA_FILE_SUFFIX = ".java";
@@ -25,6 +31,18 @@ public interface GeneratorConstant {
      * mapper文件类型后缀
      */
     String MAPPER_FILE_SUFFIX = "Mapper.java";
+
+    /**
+     * entity模板
+     */
+    String REQUEST_TEMPLATE= "request.ftl";
+
+
+    /**
+     * Convert
+     */
+    String CONVERT_FILE_SUFFIX= "Convert.java";
+
     /**
      * service文件类型后缀
      */
@@ -65,4 +83,9 @@ public interface GeneratorConstant {
      * mapper xml接口模板
      */
     String MAPPERXML_TEMPLATE = "mapperXml.ftl";
+
+    /**
+     * Convert
+     */
+    String CONVERT_TEMPLATE= "convert.ftl";
 }

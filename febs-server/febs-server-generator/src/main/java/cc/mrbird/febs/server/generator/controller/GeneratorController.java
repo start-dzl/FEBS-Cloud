@@ -88,6 +88,8 @@ public class GeneratorController {
         List<Column> columns = generatorService.getColumns(GeneratorConstant.DATABASE_TYPE, datasource, name);
         generatorHelper.generateEntityFile(columns, generatorConfig);
         generatorHelper.generateMapperFile(columns, generatorConfig);
+        generatorHelper.generateConvertFile(columns, generatorConfig);
+        generatorHelper.generateRequestFile(columns, generatorConfig);
         generatorHelper.generateMapperXmlFile(columns, generatorConfig);
         generatorHelper.generateServiceFile(columns, generatorConfig);
         generatorHelper.generateServiceImplFile(columns, generatorConfig);
