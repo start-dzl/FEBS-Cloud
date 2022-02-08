@@ -28,7 +28,7 @@ public class ${className} {
     /**
      * ${column.remark}
      */
-    @ApiModelProperty("${column.remark}")
+    @ApiModelProperty("${column.remark} (${column.nullable})")
         <#if column.isKey = true>
     @TableId(value = "${column.name}", type = IdType.AUTO)
         <#else>

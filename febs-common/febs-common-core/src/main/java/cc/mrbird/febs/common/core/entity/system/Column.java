@@ -27,4 +27,9 @@ public class Column {
      * 属性名称
      */
     private String field;
+
+    /**
+     * 必填选填
+     */
+    private String nullable;
 }
