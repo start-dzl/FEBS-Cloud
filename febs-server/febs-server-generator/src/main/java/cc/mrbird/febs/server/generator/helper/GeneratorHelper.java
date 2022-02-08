@@ -31,8 +31,11 @@ import java.util.Objects;
 public class GeneratorHelper {
 
     private static String getFilePath(GeneratorConfig configure, String packagePath, String suffix, boolean serviceInterface) {
-        String filePath = GeneratorConstant.TEMP_PATH + configure.getJavaPath() +
-                packageConvertPath(configure.getBasePackage() + "." + packagePath);
+//        String filePath = GeneratorConstant.TEMP_PATH + configure.getJavaPath() +
+//                packageConvertPath(configure.getBasePackage() + "." + packagePath);
+
+        String filePath = GeneratorConstant.TEMP_PATH  + configure.getJavaSimPath() +
+                packageConvertPath( "." + packagePath);
         if (serviceInterface) {
             filePath += "I";
         }

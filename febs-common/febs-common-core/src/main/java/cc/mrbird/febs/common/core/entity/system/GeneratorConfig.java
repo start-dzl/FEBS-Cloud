@@ -98,6 +98,8 @@ public class GeneratorConfig {
      * java文件路径，固定值
      */
     private transient String javaPath = "/src/main/java/";
+
+    private transient String javaSimPath = "/src/";
     /**
      * 配置文件存放路径，固定值
      */
