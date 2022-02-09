@@ -84,4 +84,17 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Releases</name>
+            <url>http://106.14.27.212:5565/repository/maven-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Snapshot</name>
+            <url>http://106.14.27.212:5565/repository/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
