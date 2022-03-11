@@ -2,7 +2,7 @@ package ${basePackage}.${servicePackage};
 
 import ${basePackage}.${entityPackage}.${className};
 
-import cc.mrbird.febs.common.core.entity.QueryRequest;
+import com.od.core.request.QueryRequest;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
