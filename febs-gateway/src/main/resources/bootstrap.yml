@@ -5,6 +5,8 @@ spring:
     name: FEBS-Gateway
   cloud:
     nacos:
+      username: febs
+      passsword: 123456
       config:
         server-addr: ${nacos.url}:8001
         group: DEFAULT_GROUP

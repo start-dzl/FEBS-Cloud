@@ -4,6 +4,8 @@ import cc.mrbird.febs.common.core.entity.router.VueRouter;
 import cc.mrbird.febs.common.core.entity.system.Menu;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -72,5 +74,8 @@ public interface IMenuService extends IService<Menu> {
      * @param menuIds menuIds
      */
     void deleteMeuns(String[] menuIds);
+
+
+    void meunsBuildExcel(HttpServletResponse response) throws IOException;
 
 }

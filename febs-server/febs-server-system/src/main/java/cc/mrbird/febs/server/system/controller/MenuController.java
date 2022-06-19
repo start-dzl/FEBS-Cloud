@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,11 +82,24 @@ public class MenuController {
         this.menuService.updateMenu(menu);
     }
 
+//    @PostMapping("excel")
+//    @PreAuthorize("hasAuthority('menu:export')")
+//    @ControllerEndpoint(operation = "导出菜单数据", exceptionMessage = "导出Excel失败")
+//    public void export(Menu menu, HttpServletResponse response) {
+//        List<Menu> menus = this.menuService.findMenuList(menu);
+//        ExcelKit.$Export(Menu.class, response).downXlsx(menus, false);
+//    }
+
     @PostMapping("excel")
     @PreAuthorize("hasAuthority('menu:export')")
     @ControllerEndpoint(operation = "导出菜单数据", exceptionMessage = "导出Excel失败")
-    public void export(Menu menu, HttpServletResponse response) {
-        List<Menu> menus = this.menuService.findMenuList(menu);
-        ExcelKit.$Export(Menu.class, response).downXlsx(menus, false);
+    public void export(Menu menu, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+        String fileName = URLEncoder.encode("测试", "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        this.menuService.meunsBuildExcel(response);
+        //ExcelKit.$Export(Menu.class, response).downXlsx(menus, false);
     }
 }

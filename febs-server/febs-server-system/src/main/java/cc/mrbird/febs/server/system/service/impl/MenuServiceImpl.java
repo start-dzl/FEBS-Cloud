@@ -1,28 +1,39 @@
 package cc.mrbird.febs.server.system.service.impl;
 
 import cc.mrbird.febs.common.core.entity.MenuTree;
+import cc.mrbird.febs.common.core.entity.QueryRequest;
 import cc.mrbird.febs.common.core.entity.Tree;
 import cc.mrbird.febs.common.core.entity.constant.PageConstant;
 import cc.mrbird.febs.common.core.entity.constant.StringConstant;
 import cc.mrbird.febs.common.core.entity.router.RouterMeta;
 import cc.mrbird.febs.common.core.entity.router.VueRouter;
 import cc.mrbird.febs.common.core.entity.system.Menu;
+import cc.mrbird.febs.common.core.entity.system.Role;
 import cc.mrbird.febs.common.core.exception.FebsException;
 import cc.mrbird.febs.common.core.utils.FebsUtil;
 import cc.mrbird.febs.common.core.utils.TreeUtil;
 import cc.mrbird.febs.server.system.mapper.MenuMapper;
 import cc.mrbird.febs.server.system.service.IMenuService;
+import cc.mrbird.febs.server.system.service.IRoleService;
+import cc.mrbird.febs.server.system.strategy.CustomMergeStrategy;
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.netty.handler.codec.smtp.SmtpRequests.data;
 
 /**
  * @author MrBird
@@ -31,6 +42,11 @@ import java.util.stream.Collectors;
 @Service("menuService")
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IMenuService {
+
+    @Autowired
+    private IRoleService roleService;
+
+
 
     @Override
     public String findUserPermissions(String username) {
@@ -121,6 +137,95 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
     @Transactional(rollbackFor = Exception.class)
     public void deleteMeuns(String[] menuIds) {
         this.delete(Arrays.asList(menuIds));
+    }
+
+    @Override
+    public void meunsBuildExcel(HttpServletResponse response) throws IOException {
+        String username = FebsUtil.getCurrentUsername();
+        QueryRequest request = new QueryRequest();
+        request.setPageSize(100);
+        IPage<Role> roleIPage = roleService.findRoles(new Role(), request);
+        List<Role> roles = roleIPage.getRecords();
+
+        //List<Menu> userPermissions = this.baseMapper.findUserMenus(username);
+        //List<Long> ids = userPermissions.stream().map(Menu::getMenuId).collect(Collectors.toList());
+        List<List<String>> data = new ArrayList<List<String>>();
+        int deep = 0;
+        for (Role role : roles) {
+            List<List<String>> listList = treeSpr(role);
+            for (List<String> ll : listList) {
+                List<String> arrayList = new ArrayList<>();
+                arrayList.add(role.getRoleName());
+                arrayList.addAll(ll);
+                deep = Math.max(deep, arrayList.size());
+                data.add(arrayList);
+            }
+
+        }
+
+        List<List<String>> head = new ArrayList<List<String>>();
+        for (int i = 0; i < deep; i++) {
+            if(i == 0) {
+                head.add(Arrays.asList("角色"));
+            }else {
+                head.add(Arrays.asList("第" + (i) + "菜单"));
+            }
+        }
+
+        EasyExcel.write(response.getOutputStream())
+                .registerWriteHandler(new CustomMergeStrategy(0, deep))
+                // 这里放入动态头
+                .head(head).sheet("模板")
+                // 当然这里数据也可以用 List<List<String>> 去传入
+                .doWrite(data);
+
+    }
+
+    private  List<List<String>> treeSpr(Role role) {
+        String[] split = role.getMenuIds().split(",");
+        List<String> ids = Arrays.asList(split);
+        LambdaQueryWrapper<Menu> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Menu::getMenuId, ids);
+        queryWrapper.orderByAsc(Menu::getOrderNum);
+        List<Menu> menus = baseMapper.selectList(queryWrapper);
+
+        List<MenuTree> trees = new ArrayList<>();
+        buildTrees(trees, menus);
+        List<? extends Tree<?>> menuTree = TreeUtil.build(trees);
+        List<List<String>> data = new ArrayList<List<String>>();
+
+        for (Tree<?> tree : menuTree) {
+            List<List<String>> treeSpr = treeSpr(tree);
+            data.addAll(treeSpr);
+        }
+        return data;
+    }
+
+
+    private  List<List<String>> treeSpr(Tree<?> tree) {
+        List<? extends Tree<?>> ctrees = tree.getChildren();
+        if(Objects.isNull(ctrees)|| ctrees.isEmpty()) {
+            List<List<String>> list = Arrays.asList(Arrays.asList(tree.getLabel()));
+            return list;
+        }else {
+            List<List<String>> arrayList = new ArrayList<>();
+            for (Tree<?> ctree : ctrees) {
+                List<List<String>> list = treeSpr(ctree);
+                arrayList.addAll(list);
+            }
+            List<List<String>> rlist = new ArrayList<>();
+
+            for (List<String> strings : arrayList) {
+                List<String> list = new ArrayList<>();
+                list.add(tree.getLabel());
+                list.addAll(strings);
+                rlist.add(list);
+            }
+
+            return rlist;
+
+        }
+
     }
 
     private void buildTrees(List<MenuTree> trees, List<Menu> menus) {
