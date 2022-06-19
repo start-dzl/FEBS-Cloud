@@ -42,4 +42,19 @@
         r.role_id
     </select>
 
+    <select id="findRoleUserName" parameterType="role" resultType="string">
+        SELECT
+        GROUP_CONCAT( u.USERNAME ) name
+        FROM
+        t_role r
+        LEFT JOIN t_user_role ur ON (r.role_id = ur.role_id)
+        LEFT JOIN t_user u ON (u.user_id = ur.user_id)
+        WHERE 1=1
+        <if test="role.roleName != null and role.roleName != ''">
+            AND r.role_name = #{role.roleName}
+        </if>
+        GROUP BY
+        r.role_id
+    </select>
+
 </mapper>

@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author MrBird
@@ -43,6 +40,16 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
         Page<Role> page = new Page<>(request.getPageNum(), request.getPageSize());
         SortUtil.handlePageSort(request, page, "createTime", FebsConstant.ORDER_DESC, false);
         return this.baseMapper.findRolePage(page, role);
+    }
+
+    @Override
+    public String findRoleByUserName(Role role) {
+        List<String> userName = this.baseMapper.findRoleUserName(role);
+        if(Objects.isNull(userName)|| StringUtils.isBlank(userName.get(0))){
+            return "";
+        }else {
+            return userName.get(0);
+        }
     }
 
     @Override

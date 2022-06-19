@@ -153,8 +153,10 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
         int deep = 0;
         for (Role role : roles) {
             List<List<String>> listList = treeSpr(role);
+            String userName = roleService.findRoleByUserName(role);
             for (List<String> ll : listList) {
                 List<String> arrayList = new ArrayList<>();
+                arrayList.add(userName);
                 arrayList.add(role.getRoleName());
                 arrayList.addAll(ll);
                 deep = Math.max(deep, arrayList.size());
@@ -166,6 +168,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements IM
         List<List<String>> head = new ArrayList<List<String>>();
         for (int i = 0; i < deep; i++) {
             if(i == 0) {
+                head.add(Arrays.asList("用户"));
+            } else if(i == 1) {
                 head.add(Arrays.asList("角色"));
             }else {
                 head.add(Arrays.asList("第" + (i) + "菜单"));

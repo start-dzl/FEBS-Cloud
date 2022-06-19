@@ -21,6 +21,8 @@ public interface IRoleService extends IService<Role> {
      */
     IPage<Role> findRoles(Role role, QueryRequest request);
 
+    String findRoleByUserName(Role role);
+
     /**
      * 获取用户角色
      *
